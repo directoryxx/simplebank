@@ -7,15 +7,14 @@ services:
     container_name: app_golang
     restart: unless-stopped
     tty: true
-    ports:
-      - "7010:8080"
+    volumes:
+      - ./:/app
+    # ports:
+      # - "7010:8080"
     working_dir: /app
-    networks:
-      - dev
+    network_mode: "host"   
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
 
-networks:
-  dev:
 
