@@ -1,7 +1,7 @@
-FROM golang:1.19.0-alpine
+FROM golang:1.19.0-buster
 
 # Install Required Package
-RUN apk add curl openssh-client gcc git make
+RUN apt update && apt install -y curl openssh-client gcc git make g++ python3
 
 # Change Workdir to /tmp
 WORKDIR /tmp
@@ -11,6 +11,12 @@ RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/
 
 # Install it to /bin
 RUN cp /tmp/migrate /bin/migrate
+
+# Install sqlc
+# RUN curl -L https://github.com/kyleconroy/sqlc/releases/download/v1.15.0/sqlc_1.15.0_linux_amd64.tar.gz | tar xz
+
+# install it to /bin
+# RUN cp /tmp/sqlc /bin/sqlc
 
 # Install Air for hot reload
 RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
@@ -22,8 +28,8 @@ RUN mkdir /app
 WORKDIR /app
 
 # Add user for golang application (Please sync your uid & gid)
-RUN addgroup -g 1000 www
-RUN adduser -s /bin/sh -u 1000 -G www -D www
+RUN addgroup --gid 1000 www
+RUN useradd --shell /bin/sh -g www -m -u 1000 www
 
 # Copy File
 COPY --chown=www . /app
@@ -33,6 +39,9 @@ RUN chown www:www /app
 
 # Change user
 USER www
+
+# Install sqlc
+RUN go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
 
 # Install Package
 RUN go install

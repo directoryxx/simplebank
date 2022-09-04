@@ -26,3 +26,9 @@ migratedown:
 
 migratedown1:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
+
+generatesqlc:
+	sqlc generate
+
+test:
+	go test -v -cover ./...
